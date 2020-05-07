@@ -1,11 +1,16 @@
 import React, { Component } from "react";
-import { Route, NavLink, Switch } from "react-router-dom";
+import { Route, NavLink, Switch, Redirect } from "react-router-dom";
 import "./Blog.css";
 import Posts from "./Posts/Posts";
-import NewPost from "./NewPost/NewPost";
-import FullPost from "./FullPost/FullPost";
+// import NewPost from "./NewPost/NewPost";
+import asyncComponent from '../../hoc/asyncComponent';
+
+const AsyncNewPost = asyncComponent(() => import('./NewPost/NewPost'));
 
 class Blog extends Component {
+    state = {
+        auth: true
+    }
 	render() {
 		return (
 			<div className="Blog">
@@ -14,7 +19,7 @@ class Blog extends Component {
 						<ul>
 							<li>
 								<NavLink
-									to="/"
+									to="/posts"
 									exact
 									activeClassName="my-active"
 									activeStyle={{
@@ -42,10 +47,13 @@ class Blog extends Component {
 				</header>
 				{/*<Route path="/" exact render={() => <h1>Home</h1>} />
                 <Route path="/" render={() => <h1>Home2</h1>} />*/}
-				<Route path="/" exact component={Posts} />
-				<Switch> {/*tells that consider only 1 route at a time*/} 
-					<Route path="/new-post" exact component={NewPost} />
-					<Route path="/:id" exact component={FullPost} />
+				<Switch>
+					{/*tells that consider only 1 route at a time*/}
+					{this.state.auth ? <Route path="/new-post" component={AsyncNewPost} /> :  null}
+                    <Route path="/posts" component={Posts} />
+                    <Route render={() => <h1>Not Found</h1>} />
+                    {/*<Redirect from='/' to='/posts' />*/}
+                    {/*<Route path='/' component={Posts} />*/}
 				</Switch>
 			</div>
 		);
